@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@model IEnumerable<NewsPortal.Models.News>
+
+@{
+    ViewData["Title"] = "Новости";
+}
+
+<br />
+@if (SignInManager.IsSignedIn(User))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-default">Создать новость</a>
+    </p>
+}
+
+@foreach (var item in Model)
+{
+    <div class="container" style="border-radius: 5px;">
+
+        <div class="row" style="background-color:#effdff; border-radius:3px;">
+            @if (SignInManager.IsSignedIn(User) &&(UserManager.GetUserId(this.User)==item.CreatedById))
+            {
+                <div class="text-right" style="margin-right:20px; margin-top:5px;"><a asp-action="Edit" asp-route-id="@item.Id"><img src="~/images/edit.png" width="20" height="20" /></a> <a asp-action="Delete" asp-route-id="@item.Id"><img src="~/images/delete.png" width="20" height="20" /></a></div>
+            }
+            else
+            {
+                <br />
+            }
+            <div class=" col-xs-12 col-sm-12">
+                <p style="margin-bottom:0;"><strong>@(item.CreatedByIdNavigation!=null?item.CreatedByIdNavigation.UserName: "Удаленный автор")</strong></p>
+                <div class="personal-sm">
+                    <small style="font-size:15px; color:#777;"><img src="~/images/watch.png" width="15" /> @item.CreatedDateTime</small>
+                </div>
+                <div class="lead">@item.Title</div>
+                @if (item.Body.Length > 200)
+                {
+                    <p id="short-@item.Id" class="lead" style="overflow:auto;">@item.ShortBody <a style="cursor:pointer;" onclick="document.getElementById('@item.Id').style.display='block';document.getElementById('short-@item.Id').style.display='none';">читать полностью</a> </p>
+                    <p id="@item.Id" class="lead" style="overflow:auto; display:none;">@item.Body </p>
+                }
+                else
+                {
+                    <p class="lead">@item.ShortBody</p>
+                }
+
+            </div>
+        </div>
+    </div>
+    <br />
+}
